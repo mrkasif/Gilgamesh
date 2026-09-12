@@ -37,7 +37,7 @@ export function Header({ title, onOpenSidebar, onNewChat }: HeaderProps) {
 
       <span className="hidden shrink-0 items-center gap-1.5 rounded-full border border-edge/80 bg-surface/70 py-1 pr-2.5 pl-2 text-[10px] font-medium tracking-[0.14em] text-faint uppercase sm:inline-flex">
         <span className="h-1.5 w-1.5 rounded-full bg-accent/80" aria-hidden />
-        Demo mode
+        Gemini API
       </span>
 
       <button

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Gilgamesh",
   description:
-    "Gilgamesh — a calm, modern AI assistant. Currently running in demo mode.",
+    "Gilgamesh — a calm, modern AI assistant powered by the free Gemini API.",
 };
 
 export const viewport: Viewport = {

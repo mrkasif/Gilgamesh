@@ -3,6 +3,7 @@
 import { Check, Moon, Sun, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import { BrandMark } from "@/components/brand/BrandMark";
 import type { Settings } from "@/lib/persistence";
 import { cn } from "@/lib/utils";
 
@@ -245,6 +246,36 @@ export function SettingsDialog({
                       )}
                     />
                   </button>
+                </div>
+              </section>
+
+              <section aria-labelledby="settings-about-title">
+                <h3
+                  id="settings-about-title"
+                  className="text-[10px] font-semibold tracking-[0.18em] text-faint uppercase"
+                >
+                  About
+                </h3>
+                <div className="mt-3 space-y-2.5">
+                  <div className="flex items-center gap-3 rounded-xl border border-edge bg-surface px-3.5 py-3">
+                    <BrandMark className="h-9 w-9 rounded-lg" />
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-medium text-foreground">
+                        Gilgamesh
+                      </p>
+                      <p className="mt-0.5 text-xs leading-4 text-faint">
+                        Made by Kashif Sayyad
+                      </p>
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-edge bg-surface px-3.5 py-3">
+                    <p className="text-[13px] font-medium text-foreground">
+                      AI engine
+                    </p>
+                    <p className="mt-0.5 text-xs leading-4 text-faint">
+                      Powered by the free Google Gemini API.
+                    </p>
+                  </div>
                 </div>
               </section>
 

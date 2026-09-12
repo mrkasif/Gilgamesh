@@ -2,7 +2,7 @@ import type { Conversation, Message, StarterPrompt } from "./types";
 import { createId } from "./utils";
 
 export const DEMO_RESPONSE =
-  "Gilgamesh is currently running in demo mode. The AI backend will be connected in a later step.";
+  "I'm not connected to an AI backend yet. The free Gemini API will power responses in an upcoming update.";
 
 export const STARTER_PROMPTS: StarterPrompt[] = [
   {

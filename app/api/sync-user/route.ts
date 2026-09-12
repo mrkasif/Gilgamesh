@@ -10,15 +10,15 @@ export async function POST(request: Request) {
   }
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anonKey) {
+  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !publishableKey) {
     return NextResponse.json(
       { error: "Supabase is not configured" },
       { status: 500 },
     );
   }
 
-  const supabase = createClient(url, anonKey, {
+  const supabase = createClient(url, publishableKey, {
     auth: { persistSession: false },
   });
 
