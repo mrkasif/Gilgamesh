@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  LogOut,
   MessageSquare,
   Search,
   Settings,
@@ -18,10 +19,12 @@ interface SidebarProps {
   conversations: Conversation[];
   activeConversationId: string | null;
   open: boolean;
+  userEmail?: string;
   onSelectConversation: (id: string) => void;
   onNewConversation: () => void;
   onDeleteConversation: (id: string) => void;
   onOpenSettings: () => void;
+  onLogout?: () => void;
   onClose: () => void;
 }
 
@@ -29,10 +32,12 @@ export function Sidebar({
   conversations,
   activeConversationId,
   open,
+  userEmail,
   onSelectConversation,
   onNewConversation,
   onDeleteConversation,
   onOpenSettings,
+  onLogout,
   onClose,
 }: SidebarProps) {
   const [query, setQuery] = useState("");
@@ -209,16 +214,27 @@ export function Sidebar({
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-2 text-[11px] font-semibold text-muted ring-1 ring-edge"
               aria-hidden
             >
-              GS
+              {userEmail
+                ? (userEmail[0] ?? "").toUpperCase()
+                : "GS"}
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-[13px] leading-tight font-medium text-foreground">
-                Guest
+                {userEmail ?? "Guest"}
               </p>
               <p className="truncate text-[11px] leading-snug text-faint">
                 Local session
               </p>
             </div>
+            <button
+              type="button"
+              onClick={onLogout}
+              aria-label="Log out"
+              title="Log out"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-faint transition-colors duration-150 hover:bg-surface-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent"
+            >
+              <LogOut className="h-4 w-4" aria-hidden />
+            </button>
             <button
               type="button"
               onClick={onOpenSettings}

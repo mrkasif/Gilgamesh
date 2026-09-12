@@ -7,6 +7,14 @@ const ChatInterface = dynamic(
   { ssr: false },
 );
 
-export default function ChatInterfaceClient() {
-  return <ChatInterface />;
+interface ChatInterfaceClientProps {
+  userEmail?: string;
+  onLogout?: () => void;
+}
+
+export default function ChatInterfaceClient({
+  userEmail,
+  onLogout,
+}: ChatInterfaceClientProps) {
+  return <ChatInterface userEmail={userEmail} onLogout={onLogout} />;
 }

@@ -21,7 +21,12 @@ import { createId, deriveTitle } from "@/lib/utils";
 
 const REPLY_DELAY_MS = 1_000;
 
-export function ChatInterface() {
+interface ChatInterfaceProps {
+  userEmail?: string;
+  onLogout?: () => void;
+}
+
+export function ChatInterface({ userEmail, onLogout }: ChatInterfaceProps) {
   const [conversations, setConversations] = useState<Conversation[]>(() => {
     const saved = loadChatState();
     return saved ? saved.conversations : MOCK_CONVERSATIONS;
@@ -262,10 +267,12 @@ export function ChatInterface() {
         conversations={conversations}
         activeConversationId={activeConversationId}
         open={sidebarOpen}
+        userEmail={userEmail}
         onSelectConversation={handleSelectConversation}
         onNewConversation={handleNewConversation}
         onDeleteConversation={handleDeleteConversation}
         onOpenSettings={() => setSettingsOpen(true)}
+        onLogout={onLogout}
         onClose={() => setSidebarOpen(false)}
       />
 

@@ -1,5 +1,5 @@
-import ChatInterfaceClient from "@/components/chat/ChatInterfaceClient";
+import AuthGate from "@/components/auth/AuthGate";
 
 export default function Home() {
-  return <ChatInterfaceClient />;
+  return <AuthGate />;
 }
