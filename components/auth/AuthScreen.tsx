@@ -148,8 +148,8 @@ export function AuthScreen() {
         </div>
 
         <p className="relative text-[11px] leading-5 text-faint">
-          Conversations are stored locally in your browser until cloud sync is
-          enabled.
+          Your conversations are saved securely in the cloud and restored
+          whenever you sign in.
         </p>
       </section>
 
