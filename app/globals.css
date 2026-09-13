@@ -107,7 +107,7 @@ body {
 @keyframes fade-slide-in {
   from {
     opacity: 0;
-    transform: translateY(5px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -116,28 +116,41 @@ body {
 }
 
 .message-in {
-  animation: fade-slide-in 180ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  animation: fade-slide-in 160ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
 }
 
 .typing-in {
-  animation: fade-slide-in 160ms ease-out both;
+  animation: fade-slide-in 140ms ease-out both;
 }
 
-@keyframes typing-bounce {
+@keyframes thinking-pulse {
   0%,
-  80%,
+  60%,
   100% {
-    transform: translateY(0);
     opacity: 0.3;
+    transform: scale(0.8);
   }
-  40% {
-    transform: translateY(-3px);
+  30% {
     opacity: 1;
+    transform: scale(1);
   }
 }
 
-.typing-dot {
-  animation: typing-bounce 1.2s ease-in-out infinite;
+.thinking-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: var(--color-accent);
+  animation: thinking-pulse 1.4s ease-in-out infinite;
+}
+
+.thinking-dot:nth-child(2) {
+  animation-delay: 160ms;
+}
+
+.thinking-dot:nth-child(3) {
+  animation-delay: 320ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -149,7 +162,7 @@ body {
 
   .message-in,
   .typing-in,
-  .typing-dot {
+  .thinking-dot {
     animation: none;
   }
 }

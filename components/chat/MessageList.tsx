@@ -15,12 +15,12 @@ interface MessageListProps {
 
 export function TypingIndicator() {
   return (
-    <div className="flex items-start gap-3" aria-label="Gilgamesh is typing">
+    <div className="flex items-start gap-3" aria-label="Gilgamesh is thinking" role="status">
       <BrandMark className="mt-0.5 h-7 w-7 shrink-0 rounded-md shadow-md shadow-black/25 ring-1 ring-edge" />
       <div className="flex h-9 items-center gap-1.5 rounded-full border border-edge bg-surface px-3.5">
-        <span className="typing-dot h-1.5 w-1.5 rounded-full bg-accent/70" />
-        <span className="typing-dot h-1.5 w-1.5 rounded-full bg-accent/70 [animation-delay:150ms]" />
-        <span className="typing-dot h-1.5 w-1.5 rounded-full bg-accent/70 [animation-delay:300ms]" />
+        <span className="thinking-dot" aria-hidden />
+        <span className="thinking-dot" aria-hidden />
+        <span className="thinking-dot" aria-hidden />
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { Check, Copy, RefreshCw } from "lucide-react";
 import { useState } from "react";
 
 import { BrandMark } from "@/components/brand/BrandMark";
+import { MarkdownContent } from "@/components/chat/MarkdownContent";
 import type { Message } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -41,8 +42,8 @@ export function MessageBubble({
     <div className="group/message">
       <div className="flex items-start gap-3">
         <BrandMark className="mt-0.5 h-7 w-7 shrink-0 rounded-md shadow-md shadow-black/25 ring-1 ring-edge" />
-        <div className="message-in min-w-0 flex-1 pt-0.5 text-[15px] leading-[1.75] whitespace-pre-wrap text-foreground text-pretty">
-          {message.content}
+        <div className="message-in min-w-0 flex-1 pt-0.5 text-[15px] leading-[1.75] text-foreground text-pretty">
+          <MarkdownContent content={message.content} />
         </div>
       </div>
       <div className="mt-1.5 flex items-center gap-0.5 pl-10 transition-opacity duration-150 md:opacity-0 md:group-hover/message:opacity-100 md:focus-within:opacity-100">

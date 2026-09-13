@@ -65,7 +65,7 @@ export function ChatComposer({
           }}
           className="mx-auto w-full max-w-[760px]"
         >
-          <div className="flex items-end gap-2 rounded-2xl border border-edge-strong bg-surface-2 py-2 pl-2 pr-2 shadow-[0_6px_24px_rgba(0,0,0,0.35)] transition-[border-color,box-shadow] duration-200 focus-within:border-accent/40 focus-within:ring-4 focus-within:ring-accent/10">
+          <div className="flex items-end gap-2 rounded-2xl border border-edge-strong bg-surface-2 py-2 pl-2 pr-2 shadow-[0_2px_14px_rgba(0,0,0,0.25)] transition-[border-color,box-shadow] duration-200 focus-within:border-accent/40 focus-within:ring-4 focus-within:ring-accent/10">
             <button
               type="button"
               disabled
@@ -109,9 +109,7 @@ export function ChatComposer({
               disabled && "opacity-60",
             )}
           >
-            {disabled
-              ? "Gilgamesh is thinking..."
-              : "Gilgamesh can make mistakes. Verify important information."}
+            Gilgamesh can make mistakes. Verify important information.
           </p>
         </form>
       </div>
