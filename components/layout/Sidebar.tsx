@@ -82,7 +82,7 @@ export function Sidebar({
         )}
       >
         <div className="flex items-center gap-3 px-4 pt-5 pb-4">
-          <BrandMark className="h-9 w-9 rounded-xl shadow-lg shadow-black/30" />
+          <BrandMark className="h-9 w-9 rounded-lg shadow-md shadow-black/30" />
           <div className="min-w-0">
             <p className="text-[15px] leading-tight font-semibold tracking-tight text-foreground">
               Gilgamesh
@@ -105,7 +105,7 @@ export function Sidebar({
           <button
             type="button"
             onClick={onNewConversation}
-            className="flex h-10 w-full items-center gap-2 rounded-xl border border-edge-strong bg-surface-2 px-3 text-[13px] font-medium text-foreground transition-[background-color,border-color] duration-150 hover:border-accent/30 hover:bg-surface-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.99]"
+            className="flex h-10 w-full items-center gap-2 rounded-lg border border-edge bg-surface px-3 text-[13px] font-medium text-foreground transition-[background-color,border-color] duration-150 hover:border-edge-strong hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.99]"
           >
             <SquarePen className="h-4 w-4 text-accent" aria-hidden />
             New chat
@@ -127,7 +127,7 @@ export function Sidebar({
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search conversations"
-              className="w-full rounded-xl border border-transparent bg-background/60 py-2 pr-3 pl-10 text-[13px] text-foreground placeholder:text-faint transition-[border-color,background-color] duration-150 hover:border-edge hover:bg-background focus:border-edge-strong focus:bg-background focus:outline-none focus:ring-2 focus:ring-accent/15"
+              className="w-full rounded-lg border border-transparent bg-background/60 py-2 pr-3 pl-10 text-[13px] text-foreground placeholder:text-faint transition-[border-color,background-color] duration-150 hover:border-edge hover:bg-background focus:border-edge-strong focus:bg-background focus:outline-none focus:ring-2 focus:ring-accent/15"
             />
           </div>
         </div>

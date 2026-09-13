@@ -1,16 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #0d0d0d;
+  --color-background: #000000;
   --color-panel: #050505;
-  --color-surface: #161616;
-  --color-surface-2: #1d1d1d;
-  --color-surface-3: #242424;
-  --color-edge: #1f1f1f;
-  --color-edge-strong: #2e2e2e;
-  --color-foreground: #efefef;
-  --color-muted: #a3a3a3;
-  --color-faint: #6f6f6f;
+  --color-composer: #111111;
+  --color-surface: #0d0d0d;
+  --color-surface-2: #141414;
+  --color-surface-3: #1c1c1c;
+  --color-edge: #1b1b1b;
+  --color-edge-strong: #222222;
+  --color-foreground: #ffffff;
+  --color-muted: #b3b3b3;
+  --color-faint: #777777;
   --color-accent: #c9a876;
   --color-accent-strong: #dcbb8a;
   --font-sans: var(--font-geist-sans);
@@ -24,14 +25,15 @@
 html[data-appearance="light"] {
   --color-background: #ffffff;
   --color-panel: #ffffff;
+  --color-composer: #ffffff;
   --color-surface: #f7f7f8;
   --color-surface-2: #ececf1;
-  --color-surface-3: #e3e3e8;
+  --color-surface-3: #e7e7ec;
   --color-edge: #ececf1;
   --color-edge-strong: #d4d4db;
-  --color-foreground: #1f1f23;
+  --color-foreground: #1a1a1f;
   --color-muted: #55555e;
-  --color-faint: #8f8f98;
+  --color-faint: #909099;
   --color-accent: #9a7133;
   --color-accent-strong: #82591f;
   color-scheme: light;
@@ -127,12 +129,10 @@ body {
   0%,
   60%,
   100% {
-    opacity: 0.3;
-    transform: scale(0.8);
+    opacity: 0.25;
   }
   30% {
     opacity: 1;
-    transform: scale(1);
   }
 }
 

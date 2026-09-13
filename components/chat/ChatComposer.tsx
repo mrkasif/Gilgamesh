@@ -53,11 +53,7 @@ export function ChatComposer({
 
   return (
     <div className="relative border-t border-edge/70">
-      <div
-        className="pointer-events-none h-5 bg-gradient-to-t from-background/95 to-transparent"
-        aria-hidden
-      />
-      <div className="bg-background px-3 pb-4 pt-1 sm:px-5">
+      <div className="bg-background px-3 pb-4 pt-2.5 sm:px-5">
         <form
           onSubmit={(event) => {
             event.preventDefault();
@@ -65,7 +61,7 @@ export function ChatComposer({
           }}
           className="mx-auto w-full max-w-[760px]"
         >
-          <div className="flex items-end gap-2 rounded-2xl border border-edge-strong bg-surface-2 py-2 pl-2 pr-2 shadow-[0_2px_14px_rgba(0,0,0,0.25)] transition-[border-color,box-shadow] duration-200 focus-within:border-accent/40 focus-within:ring-4 focus-within:ring-accent/10">
+          <div className="flex items-end gap-1.5 rounded-xl border border-edge-strong bg-composer py-1.5 pl-1.5 pr-1.5 shadow-[0_1px_10px_rgba(0,0,0,0.4)] transition-[border-color,box-shadow] duration-150 focus-within:border-edge-strong focus-within:ring-2 focus-within:ring-accent/10">
             <button
               type="button"
               disabled

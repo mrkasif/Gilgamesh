@@ -50,7 +50,7 @@ export function MessageList({
     <div
       ref={rootRef}
       aria-live="polite"
-      className="mx-auto w-full max-w-[760px] space-y-7 px-4 pt-8 pb-6 sm:px-6"
+      className="mx-auto w-full max-w-[760px] space-y-6 px-4 pt-8 pb-6 sm:px-6"
     >
       {messages.map((message) => (
         <MessageBubble

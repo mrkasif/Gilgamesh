@@ -41,13 +41,23 @@ export function ChatInterface({ userEmail, onLogout }: ChatInterfaceProps) {
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [conversationsLoading, setConversationsLoading] = useState(true);
-  const [messagesLoading, setMessagesLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const generatingConversationIdRef = useRef<string | null>(null);
   const composerRef = useRef<HTMLTextAreaElement>(null);
   const loadedConversationIdsRef = useRef<Set<string>>(new Set());
   const messagesLoadingIdRef = useRef<string | null>(null);
+  const pendingConversationsRef = useRef<Map<string, Promise<Conversation | null>>>(
+    new Map(),
+  );
+
+  const resolveConversationId = useCallback(async (id: string): Promise<string> => {
+    const pending = pendingConversationsRef.current.get(id);
+    if (!pending) return id;
+    const created = await pending;
+    if (!created) throw new ApiError("Could not create conversation. Please try again.", 0);
+    return created.id;
+  }, []);
 
   useEffect(() => {
     saveSettings(settings);
@@ -175,15 +185,17 @@ export function ChatInterface({ userEmail, onLogout }: ChatInterfaceProps) {
   const loadMessages = useCallback(
     async (id: string) => {
       if (loadedConversationIdsRef.current.has(id)) return;
+      if (messagesLoadingIdRef.current === id) return;
       messagesLoadingIdRef.current = id;
-      setMessagesLoading(true);
       try {
         const conversation = await getConversation(id);
         if (messagesLoadingIdRef.current !== id) return;
         loadedConversationIdsRef.current.add(id);
         setConversations((prev) =>
           prev.map((candidate) =>
-            candidate.id === id ? conversation : candidate,
+            candidate.id === id && generatingConversationIdRef.current !== id
+              ? conversation
+              : candidate,
           ),
         );
       } catch (err) {
@@ -192,7 +204,6 @@ export function ChatInterface({ userEmail, onLogout }: ChatInterfaceProps) {
       } finally {
         if (messagesLoadingIdRef.current === id) {
           messagesLoadingIdRef.current = null;
-          setMessagesLoading(false);
         }
       }
     },
@@ -223,26 +234,28 @@ export function ChatInterface({ userEmail, onLogout }: ChatInterfaceProps) {
 
       setIsGenerating(true);
       generatingConversationIdRef.current = conversationId;
+      let effectiveId = conversationId;
       try {
-        const result = await generateChat(conversationId, {
+        effectiveId = await resolveConversationId(conversationId);
+        const result = await generateChat(effectiveId, {
           content: text,
           title: isFirstMessage ? deriveTitle(text) : undefined,
         });
         if (result.userMessage) {
-          replaceMessage(conversationId, userMessage.id, result.userMessage);
+          replaceMessage(effectiveId, userMessage.id, result.userMessage);
         }
         if (result.title) {
-          setConversationTitle(conversationId, result.title);
+          setConversationTitle(effectiveId, result.title);
         }
         if (result.assistantMessage) {
-          appendMessage(conversationId, result.assistantMessage);
+          appendMessage(effectiveId, result.assistantMessage);
         } else if (result.error) {
           setError(result.error);
         } else {
           setError("Something went wrong. Please try again.");
         }
       } catch (err) {
-        removeMessage(conversationId, userMessage.id);
+        removeMessage(effectiveId, userMessage.id);
         handleApiError(err);
         return;
       } finally {
@@ -253,6 +266,7 @@ export function ChatInterface({ userEmail, onLogout }: ChatInterfaceProps) {
     [
       activeConversation,
       isGenerating,
+      resolveConversationId,
       appendMessage,
       setConversationTitle,
       replaceMessage,
@@ -267,17 +281,58 @@ export function ChatInterface({ userEmail, onLogout }: ChatInterfaceProps) {
     requestAnimationFrame(() => composerRef.current?.focus());
   }, []);
 
-  const handleNewConversation = useCallback(async () => {
-    try {
-      const conversation = await createConversation();
-      loadedConversationIdsRef.current.add(conversation.id);
-      setConversations((prev) => [conversation, ...prev]);
-      setActiveConversationId(conversation.id);
-      setSidebarOpen(false);
-      setDraft("");
-    } catch (err) {
-      handleApiError(err);
-    }
+  const handleNewConversation = useCallback(() => {
+    const localId = createId("c");
+    const now = Date.now();
+    const optimistic: Conversation = {
+      id: localId,
+      title: "New chat",
+      messages: [],
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    const created = createConversation()
+      .then((conversation) => {
+        pendingConversationsRef.current.delete(localId);
+        loadedConversationIdsRef.current.delete(localId);
+        loadedConversationIdsRef.current.add(conversation.id);
+        setConversations((prev) =>
+          prev.map((candidate) =>
+            candidate.id === localId
+              ? {
+                  ...conversation,
+                  messages: candidate.messages,
+                  title:
+                    candidate.title === "New chat"
+                      ? conversation.title
+                      : candidate.title,
+                  updatedAt: Math.max(candidate.updatedAt, conversation.updatedAt),
+                }
+              : candidate,
+          ),
+        );
+        setActiveConversationId((prev) =>
+          prev === localId ? conversation.id : prev,
+        );
+        return conversation;
+      })
+      .catch((err: unknown) => {
+        pendingConversationsRef.current.delete(localId);
+        setConversations((prev) =>
+          prev.filter((candidate) => candidate.id !== localId),
+        );
+        setActiveConversationId((prev) => (prev === localId ? null : prev));
+        handleApiError(err);
+        return null;
+      });
+
+    pendingConversationsRef.current.set(localId, created);
+    setConversations((prev) => [optimistic, ...prev]);
+    setActiveConversationId(localId);
+    setSidebarOpen(false);
+    setDraft("");
+    requestAnimationFrame(() => composerRef.current?.focus());
   }, [handleApiError]);
 
   const handleSelectConversation = useCallback(
@@ -291,27 +346,38 @@ export function ChatInterface({ userEmail, onLogout }: ChatInterfaceProps) {
 
   const handleDeleteConversation = useCallback(
     async (id: string) => {
-      if (generatingConversationIdRef.current === id) {
+      const effectiveId = await resolveConversationId(id).catch(() => id);
+      pendingConversationsRef.current.delete(id);
+      pendingConversationsRef.current.delete(effectiveId);
+
+      if (
+        generatingConversationIdRef.current === effectiveId ||
+        generatingConversationIdRef.current === id
+      ) {
         generatingConversationIdRef.current = null;
         setIsGenerating(false);
       }
 
       try {
-        await deleteConversationApi(id);
+        await deleteConversationApi(effectiveId);
       } catch (err) {
         handleApiError(err);
         void loadConversations();
         return;
       }
 
+      loadedConversationIdsRef.current.delete(effectiveId);
       loadedConversationIdsRef.current.delete(id);
 
       const remaining = conversations.filter(
-        (conversation) => conversation.id !== id,
+        (conversation) =>
+          conversation.id !== effectiveId && conversation.id !== id,
       );
       setConversations(remaining);
 
-      if (activeConversationId !== id) return;
+      if (activeConversationId !== id && activeConversationId !== effectiveId) {
+        return;
+      }
 
       if (remaining.length === 0) {
         setActiveConversationId(null);
@@ -324,7 +390,14 @@ export function ChatInterface({ userEmail, onLogout }: ChatInterfaceProps) {
       setActiveConversationId(next.id);
       void loadMessages(next.id);
     },
-    [conversations, activeConversationId, handleApiError, loadConversations, loadMessages],
+    [
+      conversations,
+      activeConversationId,
+      handleApiError,
+      loadConversations,
+      loadMessages,
+      resolveConversationId,
+    ],
   );
 
   const handleCopy = useCallback((message: Message) => {
@@ -336,10 +409,20 @@ export function ChatInterface({ userEmail, onLogout }: ChatInterfaceProps) {
     setIsGenerating(false);
 
     try {
+      const targets = await Promise.all(
+        conversations.map((conversation) => {
+          const pending = pendingConversationsRef.current.get(conversation.id);
+          return pending
+            ? pending.then(
+                (created) => created ?? conversation,
+                () => conversation,
+              )
+            : Promise.resolve(conversation);
+        }),
+      );
+      pendingConversationsRef.current.clear();
       await Promise.all(
-        conversations.map((conversation) =>
-          deleteConversationApi(conversation.id),
-        ),
+        targets.map((conversation) => deleteConversationApi(conversation.id)),
       );
       loadedConversationIdsRef.current.clear();
       setConversations([]);
@@ -417,7 +500,7 @@ export function ChatInterface({ userEmail, onLogout }: ChatInterfaceProps) {
   }, []);
 
   const hasMessages = (activeConversation?.messages.length ?? 0) > 0;
-  const composerDisabled = isGenerating || messagesLoading || conversationsLoading;
+  const composerDisabled = isGenerating || conversationsLoading;
 
   return (
     <div className="flex h-dvh w-full overflow-hidden bg-background font-sans text-foreground">
@@ -459,7 +542,7 @@ export function ChatInterface({ userEmail, onLogout }: ChatInterfaceProps) {
         )}
 
         <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-          {conversationsLoading || messagesLoading ? (
+          {conversationsLoading ? (
             <div className="flex h-full min-h-40 items-center justify-center">
               <div
                 className="animate-spin rounded-full border border-edge-strong border-t-accent"

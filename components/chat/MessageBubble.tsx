@@ -31,7 +31,7 @@ export function MessageBubble({
   if (isUser) {
     return (
       <div className="flex justify-end">
-        <div className="message-in max-w-[85%] rounded-2xl border border-accent/15 bg-accent/[0.07] px-4 py-2.5 text-[15px] leading-6 whitespace-pre-wrap text-foreground sm:max-w-[70%]">
+        <div className="message-in max-w-[85%] rounded-lg border border-edge-strong bg-composer px-3.5 py-2 text-[14.5px] leading-6 whitespace-pre-wrap text-foreground sm:max-w-[70%]">
           {message.content}
         </div>
       </div>

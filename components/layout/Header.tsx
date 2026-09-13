@@ -12,7 +12,7 @@ interface HeaderProps {
 
 export function Header({ title, onOpenSidebar, onNewChat }: HeaderProps) {
   return (
-    <header className="flex h-14 shrink-0 items-center gap-2 border-b border-edge/70 bg-background/85 px-3 backdrop-blur-md sm:px-5">
+    <header className="flex h-14 shrink-0 items-center gap-2 border-b border-edge/70 bg-background px-3 sm:px-5">
       <button
         type="button"
         onClick={onOpenSidebar}

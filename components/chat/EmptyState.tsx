@@ -28,7 +28,7 @@ export function EmptyState({ onStartConversation }: EmptyStateProps) {
   return (
     <div className="flex min-h-full flex-col items-center justify-center px-4 py-14 sm:px-6">
       <div className="flex max-w-xl flex-col items-center text-center">
-        <BrandMark className="h-12 w-12 rounded-2xl shadow-xl shadow-black/40 ring-1 ring-edge" />
+        <BrandMark className="h-12 w-12 rounded-xl shadow-md shadow-black/40 ring-1 ring-edge" />
         <h1 className="mt-6 text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
           How can I help you today?
         </h1>
@@ -45,7 +45,7 @@ export function EmptyState({ onStartConversation }: EmptyStateProps) {
               key={prompt.id}
               type="button"
               onClick={() => onStartConversation(prompt)}
-              className="group/starter flex items-start gap-3 rounded-xl border border-edge bg-surface px-3.5 py-3 text-left transition-[border-color,background-color] duration-150 hover:border-edge-strong hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.99]"
+              className="group/starter flex items-start gap-3 rounded-lg border border-edge bg-surface px-3.5 py-3 text-left transition-[border-color,background-color] duration-150 hover:border-edge-strong hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.99]"
             >
               <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent transition-colors duration-150 group-hover/starter:bg-accent/15">
                 <Icon className="h-[18px] w-[18px]" aria-hidden />
