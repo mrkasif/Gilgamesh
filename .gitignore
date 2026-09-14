@@ -40,3 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# python tooling - generated data (private chat history & backups)
+/exports/
+/backups/
+python/__pycache__/

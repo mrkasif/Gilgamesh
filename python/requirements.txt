@@ -1,0 +1,3 @@
+# Gilgamesh Python toolkit dependencies (standalone; separate from the Node app)
+# Install with:  pip install -r python/requirements.txt
+psycopg[binary]>=3.2

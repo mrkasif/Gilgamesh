@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Gilgamesh — Structural Diagrams</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, Helvetica, sans-serif; color: #1a1a1f; font-size: 10.5pt; line-height: 1.5; margin: 0; }
+  h1 { font-size: 18pt; margin: 0 0 2px; }
+  .subtitle { color: #555; font-size: 10pt; margin-bottom: 14px; }
+  h2 { font-size: 13pt; margin: 22px 0 8px; border-bottom: 2px solid #c9a876; padding-bottom: 3px; }
+  h3 { font-size: 11pt; margin: 14px 0 4px; }
+  p { margin: 6px 0; }
+  .diagram { background: #ffffff; border: 1px solid #ddd; border-radius: 6px; padding: 10px; text-align: center; margin: 8px 0 12px; page-break-inside: avoid; }
+  .caption { font-size: 8.5pt; color: #555; text-align: center; margin-top: 2px; }
+  table { border-collapse: collapse; width: 100%; font-size: 9pt; margin: 8px 0; }
+  th, td { border: 1px solid #ccc; padding: 4px 6px; text-align: left; vertical-align: top; }
+  th { background: #f2eee6; }
+  .pagebreak { page-break-before: always; }
+  .kick { display: inline-block; font-family: Consolas, monospace; font-size: 8.5pt; background: #f4f4f4; border: 1px solid #ddd; border-radius: 4px; padding: 1px 5px; }
+  img { max-width: 100%; }
+</style>
+</head>
+<body>
+
+<h1>Gilgamesh — An AI Chat Workspace</h1>
+<div class="subtitle">Structural Diagrams — System, Data, and Process Architecture</div>
+
+<h2>1. System Architecture Overview</h2>
+<p>The application follows a layered client&ndash;server architecture built on the Next.js App Router. The React
+client talks exclusively to the application's own API routes; API routes mediate between Supabase Authentication,
+the Prisma-managed PostgreSQL database (hosted on Supabase), and the Google Gemini API.</p>
+
+<div class="diagram">
+<svg width="720" height="400" viewBox="0 0 720 400" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 z" fill="#333"/></marker>
+  </defs>
+  <text x="360" y="20" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a1a1f">GILGAMESH &mdash; SYSTEM ARCHITECTURE</text>
+
+  <!-- Client -->
+  <rect x="40" y="40" width="640" height="86" rx="8" fill="#0d0d0d" stroke="#000" stroke-width="1.5"/>
+  <text x="360" y="60" text-anchor="middle" font-size="11" font-weight="bold" fill="#c9a876">CLIENT (Browser)</text>
+  <text x="360" y="78" text-anchor="middle" font-size="9" fill="#eee">React 19 + Tailwind v4 — AuthScreen, ChatInterface, Sidebar, ChatComposer, MessageList, MarkdownContent, SettingsDialog</text>
+  <text x="360" y="94" text-anchor="middle" font-size="9" fill="#eee">Optimistic updates &middot; background hydration &middot; reduced-motion CSS animations &middot; pitch-black theme (#000 / #111 / #222)</text>
+  <text x="360" y="110" text-anchor="middle" font-size="9" fill="#eee">Lucide icons &middot; react-markdown + remark-gfm renderer</text>
+
+  <line x1="360" y1="126" x2="360" y2="150" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Next.js app router -->
+  <rect x="40" y="152" width="640" height="86" rx="8" fill="#fff7ec" stroke="#c9a876" stroke-width="1.5"/>
+  <text x="360" y="172" text-anchor="middle" font-size="11" font-weight="bold" fill="#7a5a1f">NEXT.JS 16 APP ROUTER (Server)</text>
+  <text x="360" y="190" text-anchor="middle" font-size="9" fill="#333">API Routes: /api/conversations &middot; /api/conversations/[id] &middot; /[id]/chat &middot; /[id]/messages &middot; /[id]/messages/[messageId] &middot; /api/sync-user</text>
+  <text x="360" y="206" text-anchor="middle" font-size="9" fill="#333">Service layer: lib/auth (JWT), lib/gemini (GoogleGenAI), lib/prisma, lib/mappers, lib/api-client</text>
+  <text x="360" y="222" text-anchor="middle" font-size="9" fill="#333">Turbopack bundling &middot; TypeScript &middot; Client &amp; Server Components</text>
+
+  <!-- Bottom boxes -->
+  <line x1="150" y1="238" x2="150" y2="270" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="360" y1="238" x2="360" y2="270" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="570" y1="238" x2="570" y2="270" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <rect x="40" y="272" width="220" height="68" rx="8" fill="#f0f0f0" stroke="#666" stroke-width="1.5"/>
+  <text x="150" y="292" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">SUPABASE AUTH</text>
+  <text x="150" y="308" text-anchor="middle" font-size="8" fill="#444">Email / password sign-in &amp; sign-up</text>
+  <text x="150" y="322" text-anchor="middle" font-size="8" fill="#444">JWT validation (Bearer tokens)</text>
+
+  <rect x="260" y="272" width="200" height="68" rx="8" fill="#eef2ee" stroke="#3c7a3c" stroke-width="1.5"/>
+  <text x="360" y="292" text-anchor="middle" font-size="10" font-weight="bold" fill="#1d4d1d">PRISMA ORM 6 + POSTGRES</text>
+  <text x="360" y="308" text-anchor="middle" font-size="8" fill="#333">Supabase Postgres (pooler)</text>
+  <text x="360" y="322" text-anchor="middle" font-size="8" fill="#333">User &middot; Conversation &middot; Message</text>
+
+  <rect x="500" y="272" width="180" height="68" rx="8" fill="#faf0e6" stroke="#c98a3c" stroke-width="1.5"/>
+  <text x="590" y="292" text-anchor="middle" font-size="10" font-weight="bold" fill="#7a4a10">GOOGLE GEMINI API</text>
+  <text x="590" y="308" text-anchor="middle" font-size="8" fill="#333">gemini-3.6-flash</text>
+  <text x="590" y="322" text-anchor="middle" font-size="8" fill="#333">Multi-turn chat context</text>
+
+  <text x="360" y="372" text-anchor="middle" font-size="9" fill="#555">HTTP/JSON &middot; 401-expired-session handling &middot; 502 graceful degradation &middot; role-based multi-turn prompting</text>
+</svg>
+<div class="caption">Fig 1.1 &mdash; End-to-end layered architecture (client &rarr; API &rarr; databases/LLM).</div>
+</div>
+
+<h2>2. Database Entity-Relationship Diagram (Prisma Schema)</h2>
+<div class="diagram">
+<svg width="720" height="330" viewBox="0 0 720 330" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <text x="360" y="18" text-anchor="middle" font-size="12" font-weight="bold" fill="#1a1a1f">ENTITY-RELATIONSHIP DIAGRAM &mdash; PostgreSQL (Supabase)</text>
+  <rect x="40" y="40" width="200" height="120" rx="8" fill="#fff7ec" stroke="#c9a876" stroke-width="1.5"/>
+  <text x="140" y="60" text-anchor="middle" font-size="10" font-weight="bold" fill="#7a5a1f">User</text>
+  <line x1="50" y1="66" x2="230" y2="66" stroke="#c9a876"/>
+  <text x="55" y="82" font-size="8" fill="#333">id &nbsp;String @id @default(cuid())</text>
+  <text x="55" y="97" font-size="8" fill="#333">supabaseId &nbsp;String @unique</text>
+  <text x="55" y="112" font-size="8" fill="#333">email &nbsp;String @unique</text>
+  <text x="55" y="127" font-size="8" fill="#333">name &nbsp;String?</text>
+  <text x="55" y="142" font-size="8" fill="#333">createdAt / updatedAt &nbsp;DateTime</text>
+
+  <rect x="470" y="40" width="210" height="120" rx="8" fill="#fff7ec" stroke="#c9a876" stroke-width="1.5"/>
+  <text x="575" y="60" text-anchor="middle" font-size="10" font-weight="bold" fill="#7a5a1f">Message</text>
+  <line x1="480" y1="66" x2="670" y2="66" stroke="#c9a876"/>
+  <text x="485" y="82" font-size="8" fill="#333">id &nbsp;String @id @default(cuid())</text>
+  <text x="485" y="97" font-size="8" fill="#333">conversationId &nbsp;FK &rarr; Conversation</text>
+  <text x="485" y="112" font-size="8" fill="#333">role &nbsp;Role enum (user | assistant)</text>
+  <text x="485" y="127" font-size="8" fill="#333">content &nbsp;String</text>
+  <text x="485" y="142" font-size="8" fill="#333">createdAt &nbsp;DateTime</text>
+
+  <rect x="255" y="190" width="210" height="100" rx="8" fill="#fff7ec" stroke="#c9a876" stroke-width="1.5"/>
+  <text x="360" y="210" text-anchor="middle" font-size="10" font-weight="bold" fill="#7a5a1f">Conversation</text>
+  <line x1="265" y1="216" x2="455" y2="216" stroke="#c9a876"/>
+  <text x="270" y="232" font-size="8" fill="#333">id &nbsp;String @id @default(cuid())</text>
+  <text x="270" y="247" font-size="8" fill="#333">userId &nbsp;FK &rarr; User</text>
+  <text x="270" y="262" font-size="8" fill="#333">title &nbsp;String (derived from first prompt)</text>
+  <text x="270" y="277" font-size="8" fill="#333">createdAt / updatedAt &nbsp;DateTime</text>
+
+  <!-- relations -->
+  <line x1="255" y1="215" x2="230" y2="160" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="200" y="205" font-size="8" fill="#555">1 &mdash; N</text>
+  <line x1="470" y1="110" x2="465" y2="200" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="520" y="175" font-size="8" fill="#555">N &mdash; 1</text>
+
+  <text x="360" y="318" text-anchor="middle" font-size="8" fill="#555">Indexes: Conversation[userId], Conversation[updatedAt], Message[conversationId], Message[conversationId, createdAt] &middot; Cascade deletes on both relations</text>
+</svg>
+<div class="caption">Fig 2.1 &mdash; Relational model: one User owns many Conversations; each Conversation owns many Messages.</div>
+</div>
+
+<h2>3. Authentication Flow</h2>
+<div class="diagram">
+<svg width="720" height="300" viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs><marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 z" fill="#333"/></marker></defs>
+  <text x="360" y="18" text-anchor="middle" font-size="12" font-weight="bold" fill="#1a1a1f">AUTHENTICATION FLOW (SUPABASE EMAIL / PASSWORD)</text>
+  <rect x="30" y="38" width="140" height="44" rx="8" fill="#0d0d0d" stroke="#111" stroke-width="1.5"/>
+  <text x="100" y="65" text-anchor="middle" font-size="9" fill="#c9a876" font-weight="bold">AuthScreen</text>
+  <rect x="210" y="38" width="140" height="44" rx="8" fill="#f0f0f0" stroke="#666" stroke-width="1.5"/>
+  <text x="280" y="65" text-anchor="middle" font-size="9" font-weight="bold" fill="#111">Supabase client</text>
+  <rect x="390" y="38" width="140" height="44" rx="8" fill="#eef2ee" stroke="#3c7a3c" stroke-width="1.5"/>
+  <text x="460" y="65" text-anchor="middle" font-size="9" font-weight="bold" fill="#1d4d1d">Supabase Auth API</text>
+  <rect x="570" y="38" width="120" height="44" rx="8" fill="#fff7ec" stroke="#c9a876" stroke-width="1.5"/>
+  <text x="630" y="65" text-anchor="middle" font-size="9" font-weight="bold" fill="#7a5a1f">AuthGate</text>
+  <line x1="170" y1="60" x2="208" y2="60" stroke="#333" marker-end="url(#arr)"/>
+  <line x1="350" y1="60" x2="388" y2="60" stroke="#333" marker-end="url(#arr)"/>
+  <rect x="210" y="110" width="140" height="44" rx="8" fill="#f0f0f0" stroke="#666" stroke-width="1.5"/>
+  <text x="280" y="134" text-anchor="middle" font-size="8.5" fill="#333">Session / refresh callback</text>
+  <line x1="350" y1="82" x2="350" y2="108" stroke="#333" marker-end="url(#arr)"/>
+  <text x="418" y="82" text-anchor="middle" font-size="7.5" fill="#555">signInWithPassword / signUp</text>
+  <line x1="460" y1="82" x2="598" y2="98" stroke="#333" marker-end="url(#arr)"/>
+  <text x="540" y="93" text-anchor="middle" font-size="7.5" fill="#555">valid session</text>
+  <line x1="170" y1="132" x2="590" y2="128" stroke="#333" marker-end="url(#arr)"/>
+  <text x="360" y="120" text-anchor="middle" font-size="7.5" fill="#555">logged-in event &rarr; render ChatInterface</text>
+  <rect x="210" y="182" width="300" height="52" rx="8" fill="#eef2ee" stroke="#3c7a3c" stroke-width="1.5"/>
+  <text x="360" y="202" text-anchor="middle" font-size="9" font-weight="bold" fill="#1d4d1d">GET /api/sync-user</text>
+  <text x="360" y="218" text-anchor="middle" font-size="8" fill="#333">Creates-or-updates Prisma User row (supabaseId unique) &rarr; owns conversations</text>
+  <line x1="280" y1="154" x2="280" y2="180" stroke="#333" marker-end="url(#arr)"/>
+  <line x1="630" y1="128" x2="280" y2="182" stroke="#333" stroke-dasharray="4,3" stroke="#888"/>
+  <text x="630" y="175" text-anchor="middle" font-size="7.5" fill="#555">each authed request sends Bearer JWT</text>
+</svg>
+<div class="caption">Fig 3.1 &mdash; Sign-in/sign-up flows, session propagation, and user provisioning.</div>
+</div>
+
+<h2>4. Chat Message Flow (Send &rarr; Gemini &rarr; Persist)</h2>
+<div class="diagram">
+<svg width="720" height="300" viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs><marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 z" fill="#333"/></marker></defs>
+  <text x="360" y="18" text-anchor="middle" font-size="12" font-weight="bold" fill="#1a1a1f">CHAT MESSAGE FLOW</text>
+  <rect x="30" y="40" width="130" height="90" rx="8" fill="#0d0d0d" stroke="#111" stroke-width="1.5"/>
+  <text x="95" y="62" text-anchor="middle" font-size="9" font-weight="bold" fill="#c9a876">ChatInterface</text>
+  <text x="95" y="78" text-anchor="middle" font-size="7.5" fill="#eee">1. append user msg (immediate)</text>
+  <text x="95" y="92" text-anchor="middle" font-size="7.5" fill="#eee">2. show <tspan fill="#fff">&#9679; &#9679; &#9679;</tspan> thinking dots</text>
+  <text x="95" y="106" text-anchor="middle" font-size="7.5" fill="#eee">3. resolve pending conv id</text>
+  <text x="95" y="120" text-anchor="middle" font-size="7.5" fill="#eee">4. generateChat()</text>
+  <rect x="200" y="40" width="130" height="52" rx="8" fill="#fff7ec" stroke="#c9a876" stroke-width="1.5"/>
+  <text x="265" y="62" text-anchor="middle" font-size="9" font-weight="bold" fill="#7a5a1f">/api/conversations/[id]/chat</text>
+  <text x="265" y="78" text-anchor="middle" font-size="7.5" fill="#333">POST &middot; multi-turn history</text>
+  <rect x="380" y="40" width="130" height="52" rx="8" fill="#faf0e6" stroke="#c98a3c" stroke-width="1.5"/>
+  <text x="445" y="62" text-anchor="middle" font-size="9" font-weight="bold" fill="#7a4a10">lib/gemini.ts</text>
+  <text x="445" y="78" text-anchor="middle" font-size="7.5" fill="#333">gemini-3.6-flash &middot; 30s timeout</text>
+  <rect x="560" y="40" width="130" height="52" rx="8" fill="#eef2ee" stroke="#3c7a3c" stroke-width="1.5"/>
+  <text x="625" y="62" text-anchor="middle" font-size="9" font-weight="bold" fill="#1d4d1d">Prisma / Postgres</text>
+  <text x="625" y="78" text-anchor="middle" font-size="7.5" fill="#333">save user + assistant rows</text>
+  <line x1="160" y1="70" x2="198" y2="66" stroke="#333" marker-end="url(#arr)"/>
+  <line x1="330" y1="66" x2="378" y2="62" stroke="#333" marker-end="url(#arr)"/>
+  <line x1="510" y1="62" x2="558" y2="66" stroke="#333" marker-end="url(#arr)"/>
+  <text x="360" y="128" text-anchor="middle" font-size="8" fill="#555">Error handling: 401 &rarr; expired session &middot; 429 &rarr; rate limit &middot; 500 &rarr; graceful banner &amp; retry &middot; timeout &rarr; friendly message</text>
+  <rect x="30" y="150" width="660" height="66" rx="8" fill="#fbfbfb" stroke="#ccc" stroke-width="1"/>
+  <text x="360" y="170" text-anchor="middle" font-size="9" font-weight="bold" fill="#333">OPTIMISTIC UI PATH (speed)</text>
+  <text x="360" y="186" text-anchor="middle" font-size="8" fill="#444">New Chat: local "c_xxx" conversation rendered instantly &middot; DB create runs in background &middot; id swapped on resolve &middot; sends await the real id</text>
+  <text x="360" y="202" text-anchor="middle" font-size="8" fill="#444">Conversation switch: cached last message shown immediately &middot; full history hydrated by background GET &middot; no full-page spinner</text>
+</svg>
+<div class="caption">Fig 4.1 &mdash; Message pipeline and optimistic interactions.</div>
+</div>
+
+<h2>5. React Component Hierarchy</h2>
+<div class="diagram">
+<svg width="720" height="430" viewBox="0 0 720 430" xmlns="http://www.w3.org/2000/svg" font-family="Consolas, 'Courier New', monospace">
+  <text x="360" y="18" text-anchor="middle" font-size="12" font-weight="bold" fill="#1a1a1f">CLIENT COMPONENT TREE</text>
+  <text x="40" y="44" font-size="9.5" fill="#111">&lt;layout.tsx&gt; (root layout, fonts)</text>
+  <line x1="60" y1="52" x2="60" y2="64" stroke="#333"/>
+  <text x="60" y="78" font-size="9.5" fill="#111">&lt;AuthGate&gt;</text>
+  <line x1="80" y1="86" x2="80" y2="98" stroke="#333"/>
+  <text x="80" y="112" font-size="9.5" fill="#111">&#9497; no session &rarr; &lt;AuthScreen&gt; (signin/signup)</text>
+  <text x="80" y="128" font-size="9.5" fill="#111">&#9497; session &rarr; &lt;ChatInterfaceClient&gt;</text>
+  <line x1="100" y1="136" x2="100" y2="148" stroke="#333"/>
+  <text x="100" y="162" font-size="9.5" fill="#111">&lt;ChatInterface&gt; &mdash; owns conversations, settings, generating state</text>
+  <line x1="120" y1="170" x2="120" y2="182" stroke="#333"/>
+  <text x="120" y="196" font-size="9.5" fill="#111">&lt;Sidebar&gt; (search, new chat, conversation rows, delete, settings, logout)</text>
+  <text x="120" y="212" font-size="9.5" fill="#111">&lt;Header&gt; (title, Gemini badge, mobile nav)</text>
+  <text x="120" y="228" font-size="9.5" fill="#111">&lt;main&gt;</text>
+  <text x="120" y="244" font-size="9.5" fill="#111">  &emsp;&#9497; EmptyState (starter prompts)</text>
+  <text x="120" y="260" font-size="9.5" fill="#111">  &emsp;&#9497; MessageList &rarr; MessageBubble (user / assistant)</text>
+  <text x="120" y="276" font-size="9.5" fill="#111">  &emsp;&emsp;&emsp;&emsp;&rarr; MarkdownContent (react-markdown + remark-gfm)</text>
+  <text x="120" y="292" font-size="9.5" fill="#111">  &emsp;&emsp;&emsp;&emsp;&rarr; TypingIndicator (&#9679; &#9679; &#9679; CSS pulse)</text>
+  <text x="120" y="308" font-size="9.5" fill="#111">&lt;ChatComposer&gt; (textarea, attach[disabled], send)</text>
+  <text x="120" y="324" font-size="9.5" fill="#111">&lt;SettingsDialog&gt; (appearance, enter-to-send, about, clear data)</text>
+  <text x="120" y="346" font-size="9.5" fill="#111">&lt;BrandMark&gt; &mdash; shared logo tile used across components</text>
+  <text x="120" y="368" font-size="9.5" fill="#444">lib/: api-client &middot; auth &middot; gemini &middot; mappers &middot; persistence &middot; supabase/client &middot; types &middot; utils</text>
+  <text x="120" y="396" font-size="9.5" fill="#444">app/api/: conversations CRUD &middot; chat &middot; messages &middot; sync-user</text>
+  <text x="120" y="414" font-size="9.5" fill="#444">prisma/: schema.prisma + migrations</text>
+</svg>
+<div class="caption">Fig 5.1 &mdash; React/Next.js component and module organization.</div>
+</div>
+
+<h2>6. API Route Map</h2>
+<table>
+  <tr><th>Method</th><th>Endpoint</th><th>What it does</th></tr>
+  <tr><td>GET</td><td>/api/conversations</td><td>List the signed-in user's conversations, newest first (with latest message preview).</td></tr>
+  <tr><td>POST</td><td>/api/conversations</td><td>Create a new empty conversation ("New chat"); returns the persisted row.</td></tr>
+  <tr><td>GET</td><td>/api/conversations/[id]</td><td>Return one conversation with its full ordered message history.</td></tr>
+  <tr><td>PATCH</td><td>/api/conversations/[id]</td><td>Update a conversation (title).</td></tr>
+  <tr><td>DELETE</td><td>/api/conversations/[id]</td><td>Delete a conversation and (cascade) its messages.</td></tr>
+  <tr><td>POST</td><td>/api/conversations/[id]/messages</td><td>Append a single user/assistant message.</td></tr>
+  <tr><td>DELETE</td><td>/api/conversations/[id]/messages/[messageId]</td><td>Remove a message (used by Regenerate).</td></tr>
+  <tr><td>POST</td><td>/api/conversations/[id]/chat</td><td>Save user turn, call Gemini with full history, persist assistant reply; returns both rows + title.</td></tr>
+  <tr><td>GET</td><td>/api/sync-user</td><td>Provision the Prisma User row from the Supabase identity.</td></tr>
+</table>
+
+<h2 class="pagebreak">7. Regenerate &amp; Error-Handling Flow</h2>
+<div class="diagram">
+<svg width="720" height="250" viewBox="0 0 720 250" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs><marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 z" fill="#333"/></marker></defs>
+  <text x="360" y="18" text-anchor="middle" font-size="12" font-weight="bold" fill="#1a1a1f">REGENERATE + ERROR HANDLING</text>
+  <rect x="30" y="36" width="200" height="52" rx="8" fill="#0d0d0d" stroke="#111" stroke-width="1.5"/>
+  <text x="130" y="56" text-anchor="middle" font-size="9" font-weight="bold" fill="#c9a876">Regenerate clicked</text>
+  <text x="130" y="74" text-anchor="middle" font-size="7.5" fill="#eee">drop last assistant reply locally</text>
+  <rect x="280" y="36" width="180" height="52" rx="8" fill="#fff7ec" stroke="#c9a876" stroke-width="1.5"/>
+  <text x="370" y="56" text-anchor="middle" font-size="9" font-weight="bold" fill="#7a5a1f">DELETE message + POST chat</text>
+  <text x="370" y="74" text-anchor="middle" font-size="7.5" fill="#333">regenerate:true &rarr; history = up to last user msg</text>
+  <rect x="510" y="36" width="180" height="52" rx="8" fill="#faf0e6" stroke="#c98a3c" stroke-width="1.5"/>
+  <text x="600" y="56" text-anchor="middle" font-size="9" font-weight="bold" fill="#7a4a10">New Gemini answer</text>
+  <text x="600" y="74" text-anchor="middle" font-size="7.5" fill="#333">appended &rarr; sidebar updated</text>
+  <line x1="230" y1="62" x2="278" y2="62" stroke="#333" marker-end="url(#arr)"/>
+  <line x1="460" y1="62" x2="508" y2="62" stroke="#333" marker-end="url(#arr)"/>
+  <rect x="30" y="120" width="660" height="108" rx="8" fill="#fbfbfb" stroke="#ccc" stroke-width="1"/>
+  <text x="360" y="142" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#333">DECISION TREE (lib/gemini.ts + api-client.ts)</text>
+  <text x="48" y="162" font-size="8.5" fill="#444">&bull; Missing GEMINI_API_KEY &rarr; &lt;GeminiError&gt; "not configured" &rarr; 502 JSON to client</text>
+  <text x="48" y="180" font-size="8.5" fill="#444">&bull; 30s AbortSignal timeout &rarr; "Gemini is taking too long" &rarr; 502</text>
+  <text x="48" y="198" font-size="8.5" fill="#444">&bull; 429 / rate limit / quota &rarr; "Rate limit reached, try again" &rarr; 502</text>
+  <text x="48" y="216" font-size="8.5" fill="#444">&bull; Empty model response &rarr; "empty response" &rarr; 502 &middot; Client renders a dismissible error banner and keeps prior messages</text>
+</svg>
+<div class="caption">Fig 7.1 &mdash; Regenerate (+ regen) and graceful failure paths.</div>
+</div>
+
+<h2>8. Interaction Flow Summary</h2>
+<table>
+  <tr><th>Interaction</th><th>New behaviour</th><th>Why it is fast</th></tr>
+  <tr><td>New Chat</td><td>Empty conversation appears instantly; NPC created in background</td><td>Optimistic local id swapped for server id on resolve; composer auto-focused</td></tr>
+  <tr><td>Switch conversation</td><td>Known messages render immediately; history hydrates in background</td><td>No full-page spinner; per-conversation load dedup (Set of loaded ids)</td></tr>
+  <tr><td>Send message</td><td>User bubble + thinking dots appear instantly</td><td>UI updates before the fetch; does not wait for server</td></tr>
+  <tr><td>Thinking indicator</td><td>Three bronze dots, CSS opacity pulse, staggered 0/160/320&nbsp;ms</td><td>GPU-composited; disabled under prefers-reduced-motion</td></tr>
+  <tr><td>Response render</td><td>Markdown: headings, lists, bold/italic, code blocks, links</td><td>react-markdown + remark-gfm, no dangerouslySetInnerHTML</td></tr>
+  <tr><td>Persistence</td><td>All turns saved to Postgres per user, multi-device</td><td>Server-owned ownership checks; cascade deletes</td></tr>
+</table>
+
+</body>
+</html>

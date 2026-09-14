@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Gilgamesh — Project Progress (Start to End)</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, Helvetica, sans-serif; color: #1a1a1f; font-size: 10.5pt; line-height: 1.55; margin: 0; }
+  h1 { font-size: 18pt; margin: 0 0 2px; }
+  .subtitle { color: #555; font-size: 10pt; margin-bottom: 14px; }
+  h2 { font-size: 13pt; margin: 20px 0 8px; border-bottom: 2px solid #c9a876; padding-bottom: 3px; }
+  h3 { font-size: 11pt; margin: 12px 0 4px; }
+  p { margin: 6px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 9pt; margin: 8px 0; }
+  th, td { border: 1px solid #ccc; padding: 4px 7px; text-align: left; vertical-align: top; }
+  th { background: #f2eee6; }
+  .timeline { border-left: 3px solid #c9a876; margin: 14px 0 0 6px; padding-left: 18px; }
+  .milestone { margin-bottom: 18px; page-break-inside: avoid; }
+  .mhead { font-weight: 700; font-size: 11pt; color: #7a5a1f; }
+  .mmeta { font-family: Consolas, monospace; font-size: 8.5pt; color: #555; }
+  .mbadge { display: inline-block; background: #e9f2e9; color: #1d4d1d; border: 1px solid #3c7a3c; border-radius: 10px; font-size: 8pt; padding: 1px 8px; margin-left: 6px; }
+  pre { background: #f7f7f7; border: 1px solid #e2e2e2; border-radius: 5px; padding: 8px 10px; font-family: Consolas, monospace; font-size: 8.5pt; overflow-x: hidden; white-space: pre-wrap; }
+  .kb { font-family: Consolas, monospace; background: #f2f2f2; border-radius: 3px; padding: 0 4px; font-size: 9pt; }
+  .pagebreak { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<h1>Gilgamesh — Project Progress</h1>
+<div class="subtitle">Step-by-step development record: from an empty Next.js template to a complete AI chat workspace.</div>
+
+<h2>Phase Summary</h2>
+<table>
+  <tr><th>#</th><th>Step / Commit</th><th>Date</th><th>Type</th><th>Result</th></tr>
+  <tr><td>S1</td><td>Initial commit from Create Next App</td><td>2026-09-12</td><td>Scaffolding</td><td>Next.js app skeleton (App Router)</td></tr>
+  <tr><td>S2</td><td>Steps 1&ndash;4: Chat UI + management</td><td>2026-09-12</td><td>Feature</td><td>Working chat UI, themes, localStorage, settings</td></tr>
+  <tr><td>S3</td><td>Prisma + Supabase Postgres datasource</td><td>2026-09-12</td><td>Infrastructure</td><td>ORM wired to hosted Postgres</td></tr>
+  <tr><td>S4</td><td>Initial schema: User / Conversation / Message</td><td>2026-09-12</td><td>Data</td><td>Migrations applied to Supabase</td></tr>
+  <tr><td>S5</td><td>Supabase email/password auth</td><td>2026-09-12</td><td>Feature</td><td>Auth gate + sync-user provisioning</td></tr>
+  <tr><td>S6</td><td>Key rename + About section cleanup</td><td>2026-09-12</td><td>Polish</td><td>Safe publishable key handling, attribution</td></tr>
+  <tr><td>S7</td><td>Postgres persistence + Gemini AI responses</td><td>2026-09-12</td><td>Core</td><td>Real AI chat, multi-device history, regenerate</td></tr>
+  <tr><td>S8</td><td>Markdown rendering + typing dots</td><td>2026-09-13</td><td>UX</td><td>Rich assistant output + thinking animation</td></tr>
+  <tr><td>S9</td><td>Pitch-black UI + instant interactions</td><td>2026-09-13</td><td>Performance</td><td>Optimistic New Chat, no page spinner, #000 theme</td></tr>
+</table>
+
+<div class="timeline">
+
+  <div class="milestone">
+    <div class="mhead">S1 &mdash; Project Scaffolding <span class="mbadge">COMPLETED</span></div>
+    <div class="mmeta">commit bcd36ba &middot; 2026-09-12 17:27 &middot; "Initial commit from Create Next App"</div>
+    <p>Created the project with Next.js's standard starter, giving a TypeScript + Tailwind CSS + App Router base.
+    Confirmed <span class="kb">npm run dev</span> boots on <span class="kb">localhost:3000</span>. Planned the product name
+    <strong>Gilgamesh</strong> and the feature set (chat, conversations, themes, settings, AI replies, persistence).</p>
+  </div>
+
+  <div class="milestone">
+    <div class="mhead">S2 &mdash; Chat Interface, Conversation Management, Themes, localStorage, Settings <span class="mbadge">COMPLETED</span></div>
+    <div class="mmeta">commit ed508f0 &middot; 2026-09-12 19:38 &middot; "Steps 1&ndash;4: chat UI, conversation management, pure-black + light themes, localStorage persistence, settings"</div>
+    <p>Built the complete client-side chat experience without any backend yet:</p>
+    <ul>
+      <li><strong>Chat UI</strong> &mdash; sidebar, header, message bubbles, composer with Send, and a three-dot thinking indicator.</li>
+      <li><strong>Conversation management</strong> &mdash; New chat, switching between chats, delete single, clear all, regenerate last answer, custom titles.</li>
+      <li><strong>Themes</strong> &mdash; a pure-black appearance plus a light appearance; brand mark component.</li>
+      <li><strong>localStorage persistence</strong> &mdash; conversations survived reloads before any database existed.</li>
+      <li><strong>Settings</strong> &mdash; appearance picker, enter-to-send toggle, About section.</li>
+    </ul>
+    <p>Verified in the browser at 1280&times;800 and mobile widths (390/360&nbsp;px): admin-less flows, no overflow, reload keeps data.</p>
+  </div>
+
+  <div class="milestone">
+    <div class="mhead">S3 &mdash; Prisma ORM with Supabase Postgres <span class="mbadge">COMPLETED</span></div>
+    <div class="mmeta">commit 16f3500 &middot; 2026-09-12 20:27 &middot; "Add Prisma 6 with Supabase Postgres datasource configuration"</div>
+    <p>Added <span class="kb">prisma@6.19.3</span> pinned to Prisma&nbsp;6 (version-locked to avoid breaking client/schema changes),
+    created the <span class="kb">datasource db</span> block pointing at the hosted Supabase Postgres via connection-pooling
+    (<span class="kb">DATABASE_URL</span>) and direct connection (<span class="kb">DIRECT_URL</span>), and moved credentials into
+    <span class="kb">.env</span>. Verified <span class="kb">prisma generate</span> and connectivity from <span class="kb">prisma migrate dev status</span>.</p>
+  </div>
+
+  <div class="milestone">
+    <div class="mhead">S4 &mdash; Initial Database Schema <span class="mbadge">COMPLETED</span></div>
+    <div class="mmeta">commit 034a669 &middot; 2026-09-12 21:16 &middot; "Add initial Gilgamesh chat schema: User, Conversation, Message models with indexes and cascade FKs"</div>
+    <p>Defined three models for the chat domain and applied the migration to Supabase Postgres:</p>
+    <pre>model User { id, supabaseId @unique, email @unique, name?, createdAt, updatedAt, conversations[] }
+model Conversation { id, userId FK-&gt;User, title, createdAt, updatedAt, user, messages[] } // @@index([userId]), @@index([updatedAt])
+model Message { id, conversationId FK-&gt;Conversation, role (user|assistant), content, createdAt }
+// @@index([conversationId]), @@index([conversationId, createdAt]); cascade deletes on both relations</pre>
+    <p>Ownership is enforced per-user (every row carries the owning <span class="kb">userId</span>), and ordered history
+    reads are covered by the composite <span class="kb">(conversationId, createdAt)</span> index.</p>
+  </div>
+
+  <div class="milestone">
+    <div class="mhead">S5 &mdash; Supabase Email/Password Authentication <span class="mbadge">COMPLETED</span></div>
+    <div class="mmeta">commit 2ff212d &middot; 2026-09-12 21:38 &middot; "Add Supabase email/password auth with auth gate, sync-user route, and supabaseId on User"</div>
+    <p>Guarded the app with real accounts: a browser-side Supabase client manages sign-in/sign-up and sessions;
+    signed-out users see only the <strong>AuthScreen</strong>. A server-side <span class="kb">AuthGate</span> validates the
+    JWT on every API call (expired sessions return 401 and are handled in the UI). A <span class="kb">GET /api/sync-user</span>
+    route provisions the matching Prisma <span class="kb">User</span> row from the Supabase identity so every conversation belongs
+    to a real account. Tested the full loop with a real Supabase-hosted account.</p>
+  </div>
+
+  <div class="milestone">
+    <div class="mhead">S6 &mdash; Key Handling Cleanup + About Section <span class="mbadge">COMPLETED</span></div>
+    <div class="mmeta">commit d18c6ff &middot; 2026-09-12 21:51 &middot; "Rename Supabase key env var to NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, remove demo mode badge, add About section with attribution and Gemini API note"</div>
+    <p>Renamed the Supabase key variable to <span class="kb">NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</span> for correct
+    publishable-key semantics, removed the temporary "demo mode" badge, and expanded the About dialog with proper
+    attribution and a note about the Gemini API. <span class="kb">GEMINI_API_KEY</span> remains server-side only (never exposed to the browser).</p>
+  </div>
+
+  <div class="milestone">
+    <div class="mhead">S7 &mdash; Postgres Persistence + Real Gemini AI Responses <span class="mbadge">COMPLETED</span></div>
+    <div class="mmeta">commit e6a3465 &middot; 2026-09-12 22:42 &middot; "Move chat persistence to Supabase Postgres and add Gemini AI responses"</div>
+    <p>The biggest step: replaced localStorage with the database and connected the live LLM.</p>
+    <ul>
+      <li><strong>lib/gemini.ts</strong> &mdash; <span class="kb">generateAssistantReply(history)</span> calling
+        <span class="kb">gemini-3.6-flash</span> via the Google GenAI SDK, translating app roles to model roles, with a 30&nbsp;s
+        timeout and typed <span class="kb">GeminiError</span>s for missing key, timeout, rate-limit (429), and empty responses.</li>
+      <li><strong>API route set</strong> &mdash; conversations list/create/update/delete, message append/delete, and the multi-turn
+        <span class="kb">POST /[id]/chat</span> that persists the user turn, calls Gemini with full ordered history, saves the
+        assistant reply, and dedupes network/DB writes with a request key.</li>
+      <li><strong>ChatInterface</strong> &mdash; the client now treats messages as DB-backed (completed via mappers),
+        regeneration drops the last assistant reply and re-asks, and the sidebar reflects the latest conversation/date.</li>
+    </ul>
+    <p>Verified end-to-end in the browser: sign-in, ask the model, reload &mdash; history restored from Postgres; regenerated
+    answers replaced cleanly; expired session produced a correct 401 flow.</p>
+  </div>
+
+  <div class="milestone">
+    <div class="mhead">S8 &mdash; Markdown Rendering + Three-Dot Thinking Animation <span class="mbadge">COMPLETED</span></div>
+    <div class="mmeta">commit 1d942ac &middot; 2026-09-13 09:41 &middot; "Render assistant responses as Markdown and add simple three-dot thinking animation"</div>
+    <p>Replaced plain-text assistant output with proper formatting using <span class="kb">react-markdown</span> +
+    <span class="kb">remark-gfm</span>: headings, bullet/numbered lists, bold and italic, inline code, fenced code blocks with a
+    copy button, and tables. The thinking indicator became simple staggered <span class="kb">&#9679; &#9679; &#9679;</span> CSS opacity
+    dots (160&nbsp;ms entrance transitions, disabled under <span class="kb">prefers-reduced-motion</span>). Verified via
+    TypeScript, ESLint, a production build, and browser checks at multiple widths.</p>
+  </div>
+
+  <div class="milestone">
+    <div class="mhead">S9 &mdash; Pitch-Black UI + Instant, Optimistic Interactions <span class="mbadge">LAST STEP</span></div>
+    <div class="mmeta">commit 7d82a97 &middot; 2026-09-13 10:02 &middot; "Give the chat UI a pitch-black theme and make New Chat and conversation switching feel instant"</div>
+    <p>Final polish focused on speed and a clean, minimal look:</p>
+    <ul>
+      <li><strong>Pitch-black palette</strong> &mdash; background <span class="kb">#000</span>, sidebar <span class="kb">#050505</span>,
+        composer &amp; user bubbles <span class="kb">#111</span>, borders <span class="kb">#222</span>, text white/grey; bronze
+        <span class="kb">#c9a876</span> reserved for small accents only. No gradients, glow, glassmorphism, or large radius &mdash; verified by computed styles.</li>
+      <li><strong>Instant New Chat</strong> &mdash; the new conversation is created optimistically in state (local id), rendered
+        immediately, and the database create runs in the background; the local id is swapped for the server id when it resolves,
+        so a user can even type and send before the create finishes.</li>
+      <li><strong>Fast conversation switching</strong> &mdash; the full-page "messages loading" spinner was removed. Known messages
+        render instantly; missing history hydrates via a background <span class="kb">GET</span> that never clobbers a conversation
+        currently generating. Conversation IDs are deduplicated so nothing loads twice.</li>
+      <li><strong>Delete/clear safety</strong> &mdash; pending optimistic conversations are resolved before deletion so no orphaned rows remain.</li>
+    </ul>
+    <p>Verification: <span class="kb">tsc</span>, <span class="kb">eslint</span>, <span class="kb">next build</span> all pass; browser
+    checks confirm palette values (rgb 0/0/0, 5/5/5, 17/17/17, 34/34/34), instant empty-chat creation with composer focus,
+    background POST /api/conversations, immediate user bubble + dots on send, and no overflow at 1280/768/390/360&nbsp;px.</p>
+  </div>
+
+</div>
+
+<h2 class="pagebreak">Quality Gates Run Throughout</h2>
+<table>
+  <tr><th>Gate</th><th>Command</th><th>Outcome</th></tr>
+  <tr><td>Static type check</td><td class="kb">npx tsc --noEmit</td><td>Passed after every feature step</td></tr>
+  <tr><td>Lint</td><td class="kb">npm run lint</td><td>Passed, zero rule violations</td></tr>
+  <tr><td>Production build</td><td class="kb">npm run build</td><td>Passed on every release step</td></tr>
+  <tr><td>Browser verification</td><td>local preview 1280&times;800 + 768/390/360&nbsp;px</td><td>No overflow, reduced-motion respected</td></tr>
+  <tr><td>Live AI round-trip</td><td>real Gemini call through the API route</td><td>Response persisted and restored after reload</td></tr>
+</table>
+
+<h2>Environment &amp; Toolchain</h2>
+<table>
+  <tr><th>Item</th><th>Value</th></tr>
+  <tr><td>OS / runtime</td><td>Windows 11 &middot; Node.js v24.19.0 &middot; npm</td></tr>
+  <tr><td>Framework</td><td>Next.js 16.3.5 (App Router, Turbopack dev/build)</td></tr>
+  <tr><td>Languages</td><td>TypeScript (strict), React 19.2.8</td></tr>
+  <tr><td>Styling</td><td>Tailwind CSS v4 (CSS-first config, @theme tokens)</td></tr>
+  <tr><td>Database</td><td>PostgreSQL hosted on Supabase, connected via Prisma ORM 6.19.3</td></tr>
+  <tr><td>Auth</td><td>Supabase Auth (email/password) with JWT-validating server gate</td></tr>
+  <tr><td>AI</td><td>Google Gemini API &mdash; gemini-3.6-flash via @google/genai 2.22.0</td></tr>
+  <tr><td>Rendering</td><td>react-markdown 10 + remark-gfm 4 &middot; lucide-react icons</td></tr>
+  <tr><td>Repository</td><td>github.com/mrkasif/Gilgamesh &mdash; branch master, 9 commits, working tree clean</td></tr>
+</table>
+
+</body>
+</html>

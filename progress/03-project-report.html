@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Gilgamesh — Project Report</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, Helvetica, sans-serif; color: #1a1a1f; font-size: 10.5pt; line-height: 1.55; margin: 0; }
+  h1 { font-size: 20pt; margin: 0 0 2px; }
+  .subtitle { color: #555; font-size: 10.5pt; }
+  h2 { font-size: 13.5pt; margin: 22px 0 8px; border-bottom: 2px solid #c9a876; padding-bottom: 3px; page-break-after: avoid; }
+  h3 { font-size: 11pt; margin: 12px 0 4px; }
+  p { margin: 6px 0; }
+  ul, ol { margin: 4px 0 8px; padding-left: 22px; }
+  li { margin: 2px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 9pt; margin: 8px 0; page-break-inside: avoid; }
+  th, td { border: 1px solid #ccc; padding: 4px 7px; text-align: left; vertical-align: top; }
+  th { background: #f2eee6; }
+  pre { background: #f7f7f7; border: 1px solid #e2e2e2; border-radius: 5px; padding: 8px 10px; font-family: Consolas, monospace; font-size: 8pt; line-height: 1.4; overflow-x: hidden; white-space: pre-wrap; page-break-inside: avoid; }
+  code { font-family: Consolas, monospace; background: #f2f2f2; border-radius: 3px; padding: 0 4px; font-size: 9pt; }
+  .pagebreak { page-break-before: always; }
+  .toc li { margin: 4px 0; }
+  .mock { border: 1px solid #ddd; border-radius: 6px; margin: 8px 0; display: inline-block; padding: 10px; background:#fff; page-break-inside: avoid; }
+  .mock svg { display: block; }
+  .cap { font-size: 8.5pt; color: #555; margin: 2px 0 8px; }
+  .box { background: #fbfbfb; border: 1px solid #e4e4e4; border-radius: 6px; padding: 10px 12px; margin: 8px 0; }
+</style>
+</head>
+<body>
+
+<h1>Gilgamesh</h1>
+<div class="subtitle">A Modern AI Chat Workspace — Full Project Report</div>
+
+<h2>Table of Contents</h2>
+<ol class="toc">
+  <li>Introduction</li>
+  <li>Problem Statement</li>
+  <li>Objectives</li>
+  <li>Scope of the Project</li>
+  <li>Project Description / Methodology</li>
+  <li>Technologies &amp; Tools Used</li>
+  <li>System Requirements</li>
+  <li>Implementation &amp; Working</li>
+  <li>Output / Screenshots</li>
+  <li>Advantages &amp; Limitations</li>
+  <li>Future Scope</li>
+  <li>Conclusion</li>
+  <li>References</li>
+  <li>Appendix &ndash; Source Code</li>
+</ol>
+
+<h2 class="pagebreak">1. Introduction</h2>
+<p><strong>Gilgamesh</strong> is a modern, personalized AI chat workspace built as a full-stack web application. It lets a
+registered user hold typed conversations with the Google Gemini large language model, keeps every conversation and message
+safe in a hosted PostgreSQL database, and presents everything inside a focused, pitch-black, lightweight interface. The name
+echoes the epic "Epic of Gilgamesh" &mdash; fitting for a tool built around conversation and record-keeping.</p>
+<p>The application demonstrates a complete production-shaped stack: authentication, role-based data ownership, a chat API,
+external LLM integration, markdown rendering, optimistic UI updates, responsive layout, and strict quality gates (TypeScript,
+ESLint, production build). It is structured so the frontend (React) never talks to the database or the AI directly &mdash;
+every operation flows through the application's own API routes, which owners-check each request.</p>
+
+<h2>2. Problem Statement</h2>
+<p>Casual AI chat is dominated by walled-garden websites where each provider locks users into its own interface, chat history
+is scattered or ephemeral, the experience is visually heavy and cluttered, and users have little control over their data or
+the look and feel of the tool. Building a personal chat assistant that feels <em>owned</em> requires solving several problems:</p>
+<ul>
+  <li><strong>Accountability</strong> &mdash; chat history should belong to a user account and follow them across devices.</li>
+  <li><strong>Speed perception</strong> &mdash; a backend round-trip on every action (new chat, switching, sending) makes an app
+    feel slow even when the network is fast; the UI must update optimistically.</li>
+  <li><strong>Content quality</strong> &mdash; assistant answers contain headings, lists, and code; plain text destroys the value.</li>
+  <li><strong>Visual focus</strong> &mdash; attention-heavy gradients, glows, and cards distract from the conversation.</li>
+  <li><strong>Reliability</strong> &mdash; an LLM call can time out, hit rate limits, or fail; the app must degrade gracefully.</li>
+</ul>
+
+<h2>3. Objectives</h2>
+<ol>
+  <li>Provide secure email/password authentication with per-user data isolation.</li>
+  <li>Deliver a real AI assistant powered by the Google Gemini API with multi-turn context.</li>
+  <li>Persist all conversations and messages to a production PostgreSQL database with proper relations and indexing.</li>
+  <li>Make every primary interaction feel instant through optimistic UI updates and background loading.</li>
+  <li>Render assistant output as formatted Markdown, including code blocks and tables.</li>
+  <li>Design a simple, pitch-black interface with subtle bronze accents and no visual noise.</li>
+  <li>Keep the app responsive (desktop and mobile) and respectful of reduced-motion preferences.</li>
+  <li>Maintain clean code verified by TypeScript, ESLint, and production build checks.</li>
+</ol>
+
+<h2>4. Scope of the Project</h2>
+<div class="box"><strong>In scope:</strong> user sign-up/sign-in; conversation create, list, switch, rename, delete, clear-all;
+send/regenerate messages; three-dot thinking indicator; Markdown rendering of assistant replies; block-level UI theming
+(pitch-black + light); copy-answer button; responsive layout; optimistic New Chat; background history hydration; graceful
+error handling (401/429/500/timeout).</div>
+<div class="box"><strong>Out of scope (by design):</strong> image/voice input (the attachment button is intentionally disabled),
+multi-model selection, file uploads, streaming tokens (responses arrive whole), shared/team workspaces, mobile apps, and any
+backend changes beyond the chat domain &mdash; the project deliberately keeps the AI key server-side only.</div>
+
+<h2 class="pagebreak">5. Project Description / Methodology</h2>
+<p>The project was developed in <strong>nine incremental steps</strong>, each gated by checks and browser verification:</p>
+<table>
+  <tr><th>Step</th><th>Work</th></tr>
+  <tr><td>S1 &ndash; S2</td><td>Scaffold Next.js app; hand-built chat UI, conversation management, black/light themes, localStorage persistence, settings.</td></tr>
+  <tr><td>S3 &ndash; S4</td><td>Introduce Prisma ORM + Supabase Postgres; design and migrate the User/Conversation/Message schema with indexes and cascades.</td></tr>
+  <tr><td>S5 &ndash; S6</td><td>Add Supabase Auth with a JWT-validating gate and user provisioning; clean key naming; About section.</td></tr>
+  <tr><td>S7</td><td>Replace localStorage with Postgres persistence; integrate the Gemini API for multi-turn responses and regenerate.</td></tr>
+  <tr><td>S8 &ndash; S9</td><td>Markdown rendering + thinking dots; pitch-black theme and optimistic, instant interactions.</td></tr>
+</table>
+<p><strong>Architecture (request flow):</strong> Browser <span style="font-family:Consolas">&#8594;</span> Next.js API Route
+<span style="font-family:Consolas">&#8594;</span> owner check + Prisma/Postgres <span style="font-family:Consolas">&#8594;</span> Gemini API
+(chat only) <span style="font-family:Consolas">&#8594;</span> persist both turns <span style="font-family:Consolas">&#8594;</span> JSON back to UI.
+The UI writes optimistically and reconciles with server results, so nothing blocks on a network round-trip.</p>
+
+<h2>6. Technologies &amp; Tools Used</h2>
+<table>
+  <tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+  <tr><td>Framework</td><td>Next.js 16.3.5 (App Router, Turbopack)</td><td>Pages, layout, API routes, server/client components</td></tr>
+  <tr><td>UI library</td><td>React 19.2.8 + lucide-react 1.45</td><td>Component tree and icons</td></tr>
+  <tr><td>Language</td><td>TypeScript 5 (strict)</td><td>Type safety across client and server</td></tr>
+  <tr><td>Styling</td><td>Tailwind CSS v4</td><td>Utility styling via CSS-first @theme tokens</td></tr>
+  <tr><td>Database</td><td>PostgreSQL (Supabase) + Prisma ORM 6.19.3</td><td>Persistent chat storage with migrations</td></tr>
+  <tr><td>Authentication</td><td>Supabase Auth (email/password)</td><td>Sign-in/up, JWT sessions, user identity</td></tr>
+  <tr><td>AI</td><td>Google Gemini API (gemini-3.6-flash), @google/genai 2.22.0</td><td>Assistant reply generation</td></tr>
+  <tr><td>Rendering</td><td>react-markdown 10 + remark-gfm 4</td><td>Safe Markdown (incl. tables) rendering</td></tr>
+  <tr><td>Quality</td><td>tsc &middot; ESLint &middot; next build</td><td>Type check, lint, production build</td></tr>
+  <tr><td>Tooling (Python)</td><td>Python 3.14 + psycopg 3</td><td>Standalone chat-history export &amp; PDF report generation</td></tr>
+</table>
+
+<h2>7. System Requirements</h2>
+<h3>Runtime (development)</h3>
+<ul>
+  <li>Node.js &ge; 20 (developed on v24.19.0) and npm</li>
+  <li>Windows / macOS / Linux; web browser (Chrome, Edge, Firefox, Safari)</li>
+</ul>
+<h3>Environment variables (.env)</h3>
+<pre>DATABASE_URL=                          # Supabase Postgres pooler connection
+DIRECT_URL=                            # Direct connection for Prisma migrations
+NEXT_PUBLIC_SUPABASE_URL=              # Supabase project URL
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=  # Supabase publishable (anon) key
+GEMINI_API_KEY=                        # Google AI Studio server-side key</pre>
+<h3>Deployment surface</h3>
+<ul>
+  <li>Hosted PostgreSQL (Supabase) with the Prisma migrations applied</li>
+  <li>Node server exposing the Next.js app (build then <span style="font-family:Consolas">next start</span>)</li>
+</ul>
+
+<h2 class="pagebreak">8. Implementation &amp; Working</h2>
+
+<h3>8.1 Schema &mdash; data ownership model</h3>
+<p>Every conversation is joined to exactly one <code>User</code> via <code>userId</code>; every message to one
+<code>Conversation</code>. Cascade deletes keep the database consistent when a conversation is removed, and a composite
+<code>(conversationId, createdAt)</code> index makes ordered history reads fast. Conversation listing is ordered by
+<code>updatedAt</code> (newest first) as the sidebar requires.</p>
+
+<h3>8.2 Authentication flow</h3>
+<p>The browser Supabase client performs <code>signInWithPassword</code> or <code>signUp</code>. The <code>AuthGate</code>
+(server component) reads the session token; every API route validates the Bearer JWT, returning 401 for expired sessions. On
+first login <code>GET /api/sync-user</code> upserts the matching Prisma <code>User</code> row keyed by the unique
+<code>supabaseId</code>.</p>
+
+<h3>8.3 Chat pipeline (send a message)</h3>
+<ol>
+  <li>The user presses Send. The ChatInterface appends the user bubble and three thinking dots immediately (no waiting).</li>
+  <li>If the conversation was frontend-optimistic, its real server id is resolved first so the request persists correctly.</li>
+  <li><code>POST /api/conversations/[id]/chat</code> saves the user turn, loads the full ordered history, and calls
+    <code>lib/gemini.generateAssistantReply()</code> with only <code>user</code>/<code>model</code> roles.</li>
+  <li>The assistant reply is persisted, both rows are returned, and the sidebar title is derived from the first prompt.</li>
+  <li>Errors become relaxed 502 JSON + a friendly, dismissible banner (rate limit, timeout, missing key, quota).</li>
+</ol>
+
+<h3>8.4 Persistence &amp; conversation management</h3>
+<p>All mutations go through REST routes: list/create/update/delete conversations, append/delete messages, and the chat route.
+Delayed/queued requests are de-duplicated with per-conversation request keys so retries do not double-append. Regenerate
+deletes the last assistant reply then re-asks with history up to the last user turn.</p>
+
+<h3>8.5 Performance &mdash; instant interactions</h3>
+<ul>
+  <li><strong>New Chat:</strong> optimistic local conversation (id <code>c_&hellip;</code>) rendered immediately and composer
+    focused; the DB create runs in the background and the local id is swapped for the server id when it resolves.</li>
+  <li><strong>Conversation switch:</strong> no page-level spinner; cached messages render instantly and a background
+    <code>GET</code> hydrates full history, skipping conversations that are currently generating.</li>
+  <li><strong>Loading discipline:</strong> the old <code>messagesLoading</code> state was removed entirely; only initial
+    conversation fetching ever shows a spinner.</li>
+</ul>
+
+<h3>8.6 Rendering &amp; theme</h3>
+<p>Assistant text flows through <code>MarkdownContent</code> (react-markdown + remark-gfm) &mdash; headings, lists, emphasis,
+inline/fenced code with copy buttons, links, and tables &mdash; without <code>dangerouslySetInnerHTML</code>. The theme is a
+pitch-black palette: <code>#000</code> background, <code>#050505</code> sidebar, <code>#111</code> composer/user bubbles,
+<code>#222</code> borders, white-to-grey text, bronze <code>#c9a876</code> only for small accents. The thinking indicator is
+three CSS opacity dots (0 &rarr; 160 &rarr; 320&nbsp;ms stagger) that stay still under <code>prefers-reduced-motion</code>.</p>
+
+<h3>8.7 Python tooling</h3>
+<p>Two standalone Python utilities complement the project without touching the application:</p>
+<ul>
+  <li><code>python/export_chat.py</code> &mdash; connects to the live Supabase Postgres (read-only) and exports every user's
+    conversations to readable Markdown files plus a <code>history.json</code> backup under <code>exports/</code>.</li>
+  <li><code>progress/generate_reports.py</code> &mdash; converts the report HTML sources into the three project PDFs using a
+    headless Chromium browser; editing the HTML and re-running the script updates the reports in seconds.</li>
+</ul>
+
+<h2 class="pagebreak">9. Output / Screenshots</h2>
+<p>The figures below reproduce the application's screens (as faithful wireframe reconstructions captured from the running app).</p>
+
+<h3>9.1 Sign-in screen</h3>
+<div class="mock">
+<svg width="560" height="250" viewBox="0 0 560 250" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="560" height="250" fill="#000000"/>
+  <rect x="220" y="26" width="20" height="20" rx="4" fill="#c9a876"/>
+  <text x="248" y="41" fill="#fff" font-size="13" font-weight="bold">Gilgamesh</text>
+  <text x="280" y="70" text-anchor="middle" fill="#fff" font-size="15" font-weight="bold">Welcome back</text>
+  <text x="280" y="88" text-anchor="middle" fill="#8a8a8a" font-size="9.5">Sign in to continue your conversations.</text>
+  <rect x="150" y="108" width="260" height="26" rx="6" fill="#111" stroke="#222"/>
+  <text x="162" y="125" fill="#666" font-size="9">Email</text>
+  <rect x="150" y="140" width="260" height="26" rx="6" fill="#111" stroke="#222"/>
+  <text x="162" y="157" fill="#666" font-size="9">Password</text>
+  <rect x="150" y="178" width="260" height="28" rx="6" fill="#c9a876"/>
+  <text x="280" y="197" text-anchor="middle" fill="#111" font-size="11" font-weight="bold">Sign in</text>
+  <text x="280" y="228" text-anchor="middle" fill="#8a8a8a" font-size="9">No account? <tspan fill="#c9a876">Create one</tspan></text>
+</svg>
+</div>
+<div class="cap">Fig 9.1 &mdash; Sign-in form with bronze call-to-action over the pitch-black theme.</div>
+
+<h3>9.2 Empty state / New chat</h3>
+<div class="mock">
+<svg width="560" height="260" viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="560" height="260" fill="#000000"/>
+  <rect x="0" y="0" width="150" height="260" fill="#050505" stroke="#1b1b1b"/>
+  <text x="14" y="24" fill="#fff" font-size="9" font-weight="bold">+ &nbsp;New chat</text>
+  <rect x="12" y="34" width="126" height="22" rx="6" fill="#111" stroke="#222"/>
+  <text x="24" y="49" fill="#666" font-size="8">Search conversations&hellip;</text>
+  <rect x="12" y="64" width="126" height="26" rx="6" fill="#1b1b1b"/>
+  <text x="20" y="80" fill="#fff" font-size="8.5">New chat</text>
+  <text x="20" y="93" fill="#777" font-size="7">just now</text>
+  <text x="14" y="240" fill="#aaa" font-size="8">Settings</text>
+  <text x="355" y="110" text-anchor="middle" fill="#fff" font-size="15" font-weight="bold">What can I help you with?</text>
+  <text x="355" y="128" text-anchor="middle" fill="#666" font-size="9">Try a starter prompt below.</text>
+  <rect x="180" y="150" width="110" height="34" rx="6" fill="#111" stroke="#222"/>
+  <text x="235" y="163" text-anchor="middle" fill="#b3b3b3" font-size="7.5">Explain a concept</text>
+  <text x="235" y="175" text-anchor="middle" fill="#777" font-size="7">like I am five</text>
+  <rect x="305" y="150" width="110" height="34" rx="6" fill="#111" stroke="#222"/>
+  <text x="360" y="163" text-anchor="middle" fill="#b3b3b3" font-size="7.5">Draft a weekly</text>
+  <text x="360" y="175" text-anchor="middle" fill="#777" font-size="7">schedule for me</text>
+  <rect x="215" y="206" width="140" height="26" rx="7" fill="#111" stroke="#222"/>
+  <text x="285" y="222" text-anchor="middle" fill="#777" font-size="8.5">Message Gilgamesh&hellip;</text>
+  <circle cx="340" cy="219" r="9" fill="#c9a876"/>
+  <path d="M336 222 l0 -6 l7 3 z" fill="#111"/>
+</svg>
+</div>
+<div class="cap">Fig 9.2 &mdash; Empty conversation with starter prompts, sidebar, and compact composer.</div>
+
+<h3>9.3 Conversation with a Gemini reply (Markdown)</h3>
+<div class="mock">
+<svg width="560" height="300" viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="560" height="300" fill="#000000"/>
+  <rect x="0" y="0" width="150" height="300" fill="#050505" stroke="#1b1b1b"/>
+  <text x="14" y="24" fill="#fff" font-size="9" font-weight="bold">+ &nbsp;New chat</text>
+  <rect x="12" y="64" width="126" height="26" rx="6" fill="#1b1b1b"/>
+  <text x="20" y="80" fill="#fff" font-size="8.5">How does Prisma work?</text>
+  <rect x="175" y="30" width="360" height="40" rx="8" fill="#111" stroke="#222"/>
+  <text x="188" y="49" fill="#e6e6e6" font-size="9">How does Prisma map my models to Postgres?</text>
+  <text x="188" y="62" fill="#777" font-size="7.5">9:12 AM</text>
+  <rect x="195" y="86" width="330" height="96" rx="4" fill="transparent"/>
+  <text x="195" y="104" fill="#c9a876" font-size="10" font-weight="bold">Prisma basics</text>
+  <text x="195" y="122" fill="#fff" font-size="9">Prisma turns your <tspan fill="#c9a876" font-family="Consolas">schema.prisma</tspan> into:</text>
+  <text x="210" y="138" fill="#e6e6e6" font-size="8.5">&bull; a typed database <tspan font-family="Consolas">Client</tspan> for queries</text>
+  <text x="210" y="152" fill="#e6e6e6" font-size="8.5">&bull; SQL migrations you can review and apply</text>
+  <text x="195" y="168" fill="#8a8a8a" font-size="8.5">Copy</text>
+  <text x="195" y="196" fill="#777" font-size="7.5">9:12 AM</text>
+  <rect x="215" y="246" width="140" height="26" rx="7" fill="#111" stroke="#222"/>
+  <text x="285" y="262" text-anchor="middle" fill="#777" font-size="8.5">Message Gilgamesh&hellip;</text>
+  <circle cx="340" cy="259" r="9" fill="#c9a876"/>
+  <path d="M336 262 l0 -6 l7 3 z" fill="#111"/>
+  <circle cx="390" cy="238" r="3" fill="#c9a876" opacity="0.5"/>
+  <circle cx="400" cy="238" r="3" fill="#c9a876" opacity="0.8"/>
+  <circle cx="410" cy="238" r="3" fill="#c9a876"/>
+</svg>
+</div>
+<div class="cap">Fig 9.3 &mdash; User bubble, Markdown-formatted assistant answer, and the three-dot thinking indicator.</div>
+
+<h2 class="pagebreak">10. Advantages &amp; Limitations</h2>
+<h3>Advantages</h3>
+<ul>
+  <li><strong>Secure and private</strong> &mdash; server-side API key, JWT-gated routes, strict per-user data ownership.</li>
+  <li><strong>Fast-feeling UX</strong> &mdash; optimistic New Chat, immediate message echo, and background hydration remove perceived latency.</li>
+  <li><strong>Persistent history</strong> &mdash; proper relational storage with indexes and cascade deletes, not browser localStorage.</li>
+  <li><strong>Rich answers</strong> &mdash; Markdown tables, lists, and code blocks render cleanly with a copy button.</li>
+  <li><strong>Calm design</strong> &mdash; a single-signal pitch-black interface with bronze accents and reduced-motion support.</li>
+  <li><strong>Clean engineering</strong> &mdash; typed client/server boundaries, graceful 401/429/timeout handling, verified by tsc/lint/build.</li>
+  <li><strong>Python tooling</strong> &mdash; read-only chat export and fast report regeneration never touch the running app.</li>
+</ul>
+<h3>Limitations</h3>
+<ul>
+  <li>Responses are delivered whole, not streamed token-by-token; very long answers wait for completion.</li>
+  <li>Attachment/upload is intentionally disabled, so only text input is supported today.</li>
+  <li>Single model (gemini-3.6-flash) &mdash; users cannot choose between models or providers.</li>
+  <li>No rate-limit in the app layer itself; heavy quota use depends on the Gemini tier for the project key.</li>
+  <li>No sharing, multi-user workspaces, or export of the full conversation history yet.</li>
+</ul>
+
+<h2>11. Future Scope</h2>
+<ul>
+  <li>Streaming responses (token-by-token) and cancellation of in-flight generations.</li>
+  <li>Model picker and per-conversation model selection; support for alternate providers.</li>
+  <li>File/image upload with multimodal Gemini input, plus voice-to-text input.</li>
+  <li>Conversation export (Markdown/JSON/PDF) inside the app, search across all messages, and conversation pins/stars.</li>
+  <li>Team workspaces and sharing with per-user permissions.</li>
+  <li>Server-side rate limiting/throttling and per-user usage meters.</li>
+  <li>Offline mode with sync queue, PWA installability, and native mobile wrappers.</li>
+</ul>
+
+<h2>12. Conclusion</h2>
+<p>Gilgamesh successfully demonstrates a complete, production-shaped AI chat workspace: real accounts, a relational database,
+a live large language model, rich Markdown output, and a UI that <em>feels</em> instant through optimistic updates.
+Breadth and depth were balanced across the stack &mdash; schema design, JWT-gated API routes, LLM integration with robust error
+handling, and careful frontend performance work. Every release step passed TypeScript, ESLint, and production builds and was
+verified in the browser at multiple screen sizes. The project fulfills its stated objectives and provides a solid base for the
+future work described above.</p>
+
+<h2>13. References</h2>
+<ol>
+  <li>Next.js Documentation &mdash; App Router, Route Handlers, Server/Client Components. <em>nextjs.org/docs</em></li>
+  <li>React 19 Documentation. <em>react.dev</em></li>
+  <li>Prisma ORM Documentation &mdash; schema, relations, Postgres datasource, migrations. <em>prisma.io/docs</em></li>
+  <li>Supabase Documentation &mdash; Auth (email/password), Postgres, connection pooling. <em>supabase.com/docs</em></li>
+  <li>Google GenAI (Gemini) SDK &mdash; <code>generateContent</code>, models. <em>ai.google.dev/gemini-api/docs</em></li>
+  <li>Tailwind CSS v4 Documentation &mdash; CSS-first configuration and <code>@theme</code> tokens. <em>tailwindcss.com/docs</em></li>
+  <li>react-markdown &amp; remark-gfm. <em>github.com/remarkjs/react-markdown</em></li>
+  <li>MDN Web Docs &mdash; <code>prefers-reduced-motion</code>, <code>AbortSignal.timeout</code>. <em>developer.mozilla.org</em></li>
+  <li>psycopg 3 &mdash; PostgreSQL adapter for Python. <em>psycopg.org</em></li>
+</ol>
+
+<h2 class="pagebreak">14. Appendix &ndash; Source Code</h2>
+<p>The full source lives at <em>github.com/mrkasif/Gilgamesh</em>. Key excerpts follow.</p>
+
+<h3>A.1 Prisma schema (<code>prisma/schema.prisma</code>)</h3>
+<pre>enum Role { user assistant }
+
+model User {
+  id         String   @id @default(cuid())
+  supabaseId String   @unique
+  email      String   @unique
+  name       String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  conversations Conversation[]
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
+  @@index([userId])
+  @@index([updatedAt])
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  role           Role
+  content        String
+  createdAt      DateTime @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  @@index([conversationId])
+  @@index([conversationId, createdAt])
+}</pre>
+
+<h3>A.2 Gemini integration (<code>lib/gemini.ts</code>, condensed)</h3>
+<pre>export const GEMINI_MODEL = "gemini-3.6-flash";
+const REQUEST_TIMEOUT_MS = 30_000;
+
+export async function generateAssistantReply(history: GeminiMessage[]): Promise&lt;string&gt; {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new GeminiError("Gemini is not configured. Add GEMINI_API_KEY ...");
+
+  const contents = history.map((e) => ({
+    role: e.role === "assistant" ? "model" : "user",
+    parts: [{ text: e.content }],
+  }));
+
+  const response = await new GoogleGenAI({ apiKey }).models.generateContent({
+    model: GEMINI_MODEL,
+    contents,
+    config: { abortSignal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) },
+  });
+
+  const text = response.text?.trim();
+  if (!text) throw new GeminiError("Gemini returned an empty response. Please try again.");
+  return text;
+}</pre>
+
+<h3>A.3 Chat route flow (<code>app/api/conversations/[id]/chat/route.ts</code>, condensed)</h3>
+<pre>export async function POST(req, { params }) {
+  const user = await requireUser(req);                 // JWT -> Prisma User or 401
+  const { message, regenerate } = await req.json();
+  const conversation = await prisma.conversation.findFirst({      // ownership
+    where: { id: params.id, userId: user.id } });
+  if (!conversation) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  await prisma.message.create({ data: { conversationId, role: "user", content: message } });
+  const history = await prisma.message.findMany({       // ordered multi-turn context
+    where: { conversationId },
+    orderBy: { createdAt: "asc" } });
+  const reply = await generateAssistantReply(toGeminiHistory(history));
+  await prisma.message.create({ data: { conversationId, role: "assistant", content: reply } });
+  return NextResponse.json({ message: reply, conversation: latestTitle });
+}</pre>
+
+<h3>A.4 Optimistic New Chat (<code>components/chat/ChatInterface.tsx</code>, condensed)</h3>
+<pre>const pendingConversationsRef = useRef(new Map&lt;string, Promise&lt;Conversation | null&gt;&gt;());
+
+async function resolveConversationId(id: string): Promise&lt;string | null&gt; {
+  if (!id.startsWith("c_")) return id;                 // already a server id
+  const existing = pendingConversationsRef.current.get(id);
+  const conv = existing ?? createConversation();        // background DB create
+  pendingConversationsRef.current.set(id, conv);
+  const resolved = await conv;
+  if (!resolved) return null;
+  pendingConversationsRef.current.delete(id);
+  setConversations((prev) => prev.map((c) => c.id === id ? { ...resolved, messages: c.messages } : c));
+  return resolved.id;
+}</pre>
+
+<h3>A.5 Theme tokens (<code>app/globals.css</code>, condensed)</h3>
+<pre>@theme inline {
+  --color-background: #000000;   --color-panel: #050505;
+  --color-composer:  #111111;    --color-surface: #0d0d0d;
+  --color-edge-strong: #222222;  --color-accent: #c9a876;
+  --color-muted: #b3b3b3;        --color-faint: #777777;
+}</pre>
+
+<h3>A.6 Python exporter (<code>python/export_chat.py</code>, core)</h3>
+<pre># Standalone, read-only. Does not affect the Next.js app or the database.
+import psycopg
+url = os.environ.get("DIRECT_URL") or os.environ.get("DATABASE_URL")
+conn = psycopg.connect(url)
+
+rows = conn.execute(
+    'SELECT "id", "title", "createdAt", "updatedAt" FROM "Conversation" '
+    'WHERE "userId" = %s ORDER BY "updatedAt" ASC', (user_id,)).fetchall()
+for convo_id, title, created, updated in rows:
+    messages = conn.execute(
+        'SELECT "role", "content", "createdAt" FROM "Message" '
+        'WHERE "conversationId" = %s ORDER BY "createdAt" ASC',
+        (convo_id,)).fetchall()
+    history.write_markdown(title, messages)   # per-user Markdown + history.json</pre>
+
+<p class="cap" style="margin-top:10px">End of report &mdash; Gilgamesh, an AI chat workspace.</p>
+
+</body>
+</html>
